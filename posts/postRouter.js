@@ -1,13 +1,39 @@
 const express = require('express');;
 
+const Posts = require('./postDb.js');
+
 const router = express.Router();
 
-router.get('/', (req, res) => {
-
+router.get('/', async (req, res) => {
+  try {
+    const posts = await Posts.get();
+    res.status(200).json(posts);
+  } catch (error) {
+    // log error to server
+    console.log(error);
+    res.status(500).json({
+      message: 'Error retrieving the posts',
+    });
+  }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
+  // will refactor later
+  try {
+    const post = await Posts.getById(req.params.id);
 
+    if (post) {
+      res.status(200).json(post);
+    } else {
+      res.status(404).json({ message: 'post not found' });
+    }
+  } catch (error) {
+    // log error to server
+    console.log(error);
+    res.status(500).json({
+      message: 'Error retrieving the post',
+    });
+  }  
 });
 
 router.delete('/:id', (req, res) => {
