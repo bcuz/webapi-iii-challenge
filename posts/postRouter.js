@@ -17,23 +17,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
-  // will refactor later
-  try {
-    const post = await Posts.getById(req.params.id);
-
-    if (post) {
-      res.status(200).json(post);
-    } else {
-      res.status(404).json({ message: 'post not found' });
-    }
-  } catch (error) {
-    // log error to server
-    console.log(error);
-    res.status(500).json({
-      message: 'Error retrieving the post',
-    });
-  }  
+router.get('/:id', validatePostId, async (req, res) => {
+  res.status(200).json(req.post);  
 });
 
 router.delete('/:id', async (req, res) => {
@@ -75,8 +60,20 @@ router.put('/:id', async (req, res) => {
 
 // custom middleware
 
-function validatePostId(req, res, next) {
+async function validatePostId(req, res, next) {
 
+  try {
+  const post = await Posts.getById(req.params.id);
+
+  if (post) {
+    req.post = post
+    next()
+  } else {
+    res.status(404).json({ message: 'post not found; invalid id' });
+  }    
+  } catch (err) {
+    res.status(500).json({ message: 'failed to process request' });    
+  }
 };
 
 module.exports = router;
