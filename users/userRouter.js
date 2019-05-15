@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.post('/:id/posts', async (req, res) => {
+router.post('/:id/posts', validateUserId, async (req, res) => {
   const postInfo = { ...req.body, user_id: req.params.id };
 
   try {
@@ -50,7 +50,7 @@ router.get('/:id', validateUserId, async (req, res) => {
   res.status(200).json(req.user);  
 });
 
-router.get('/:id/posts', async (req, res) => {
+router.get('/:id/posts', validateUserId, async (req, res) => {
   try {
     const posts = await Users.getUserPosts(req.params.id);
 
@@ -68,14 +68,11 @@ router.get('/:id/posts', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', validateUserId, async (req, res) => {
   try {
-    const count = await Users.remove(req.params.id);
-    if (count > 0) {
-      res.status(200).json({ message: 'The user has been nuked' });
-    } else {
-      res.status(404).json({ message: 'The user could not be found' });
-    }
+    await Users.remove(req.params.id);
+    
+    res.status(200).json({ message: 'The user has been nuked' });
   } catch (error) {
     // log error to server
     console.log(error);
@@ -85,14 +82,11 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', validateUserId, async (req, res) => {
   try {
-    const user = await Users.update(req.params.id, req.body);
-    if (user) {
-      res.status(200).json(user);
-    } else {
-      res.status(404).json({ message: 'The user could not be found' });
-    }
+    const user = await Users.update(req.params.id, req.body);  
+    res.status(200).json(user);
+
   } catch (error) {
     // log error to server
     console.log(error);
