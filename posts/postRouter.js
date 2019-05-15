@@ -21,15 +21,11 @@ router.get('/:id', validatePostId, async (req, res) => {
   res.status(200).json(req.post);  
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', validatePostId, async (req, res) => {
   try {
-    let removed = await Posts.remove(req.params.id);    
-    
-    if (removed) {
-      res.status(200).json({ message: 'The post has been nuked' });
-    } else {
-      res.status(404).json({ message: 'The post could not be found' });
-    }
+    await Posts.remove(req.params.id);    
+  
+    res.status(200).json({ message: 'The post has been nuked' });
   } catch (error) {
     // log error to server
     console.log(error);
@@ -39,15 +35,12 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', validatePostId, async (req, res) => {
   try {
     const post = await Posts.update(req.params.id, req.body);  
 
-    if (post) {
-      res.status(200).json(post);
-    } else {
-      res.status(404).json({ message: 'The post could not be found' });
-    }
+    res.status(200).json(post);
+
   } catch (error) {
     // log error to server
     console.log(error);
