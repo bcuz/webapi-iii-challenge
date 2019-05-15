@@ -5,7 +5,7 @@ const Posts = require('../posts/postDb.js');
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/', validateUser, async (req, res) => {
   try {
     const user = await Users.insert(req.body);
     res.status(201).json(user);
@@ -82,7 +82,7 @@ router.delete('/:id', validateUserId, async (req, res) => {
   }
 });
 
-router.put('/:id', validateUserId, async (req, res) => {
+router.put('/:id', validateUserId, async (req, res) => {  
   try {
     const user = await Users.update(req.params.id, req.body);  
     res.status(200).json(user);
@@ -113,6 +113,14 @@ async function validateUserId(req, res, next) {
 };
 
 function validateUser(req, res, next) {
+  
+  if((Object.keys(req.body).length === 0)){
+    res.status(400).json({message: "missing post data"});
+  } else if (req.body.hasOwnProperty('name') === false) { 
+    res.status(400).json({message: "missing required name field"});
+  } else {
+    next()
+  }
 
 };
 
