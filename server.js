@@ -1,10 +1,10 @@
 const express = require('express'); // importing a CommonJS module
+const server = express();
 
 const postRouter = require('./posts/postRouter.js');
 const userRouter = require('./users/userRouter.js');
 
-const server = express();
-
+server.use(express.json());
 server.use(logger)
 
 server.use('/posts', postRouter);
