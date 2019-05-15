@@ -46,22 +46,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
-  try {
-    const user = await Users.getById(req.params.id);
-
-    if (user) {
-      res.status(200).json(user);
-    } else {
-      res.status(404).json({ message: 'user not found' });
-    }
-  } catch (error) {
-    // log error to server
-    console.log(error);
-    res.status(500).json({
-      message: 'Error retrieving the user',
-    });
-  }
+router.get('/:id', validateUserId, async (req, res) => {
+  res.status(200).json(req.user);  
 });
 
 router.get('/:id/posts', async (req, res) => {
@@ -117,9 +103,19 @@ router.put('/:id', async (req, res) => {
 });
 
 //custom middleware
-
-function validateUserId(req, res, next) {
-
+async function validateUserId(req, res, next) {
+  try {
+    const user = await Users.getById(req.params.id);
+  
+    if (user) {
+      req.user = user
+      next()
+    } else {
+      res.status(404).json({ message: 'invalid user id' });
+    }    
+    } catch (err) {
+      res.status(500).json({ message: 'failed to process request' });    
+    }
 };
 
 function validateUser(req, res, next) {
