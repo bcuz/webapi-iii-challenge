@@ -18,8 +18,19 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.post('/:id/posts', (req, res) => {
+router.post('/:id/posts', async (req, res) => {
+  const postInfo = { ...req.body, user_id: req.params.id };
 
+  try {
+    const post = await Posts.insert(postInfo);
+    res.status(201).json(post);
+  } catch (error) {
+    // log error to server
+    console.log(error);
+    res.status(500).json({
+      message: 'Error adding the post',
+    });
+  }
 });
 
 router.get('/', async (req, res) => {
@@ -60,7 +71,7 @@ router.get('/:id/posts', async (req, res) => {
     if (posts.length > 0) {
       res.status(200).json(posts);
     } else {
-      res.status(404).json({ message: 'user not found' });
+      res.status(404).json({ message: 'no posts not found' });
     }
   } catch (error) {
     // log error to server
