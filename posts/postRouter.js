@@ -13,6 +13,7 @@ router.get('/', async (req, res) => {
     console.log(error);
     res.status(500).json({
       message: 'Error retrieving the posts',
+      // message: error.message,
     });
   }
 });
